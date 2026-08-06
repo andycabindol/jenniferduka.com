@@ -265,13 +265,18 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   opacity: 1;
   transform: none;
 }
+.hero-media picture,
 .hero-media img {
   width: 100%;
   height: 100%;
+  display: block;
+}
+.hero-media img {
   object-fit: cover;
-  object-position: center 12%;
-  mask-image: linear-gradient(to bottom, #000 48%, rgba(0,0,0,.7) 72%, transparent 96%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 48%, rgba(0,0,0,.7) 72%, transparent 96%);
+  object-position: center 10%;
+  /* soft fade into the white page — image itself is transparent PNG/WebP */
+  mask-image: linear-gradient(to bottom, #000 50%, rgba(0,0,0,.75) 74%, transparent 97%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 50%, rgba(0,0,0,.75) 74%, transparent 97%);
 }
 .hero-content {
   position: relative;
