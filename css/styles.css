@@ -702,17 +702,22 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   display: flex;
   flex-direction: column;
   gap: 10px;
+  background: var(--soft);
+  border-radius: 28px;
+  padding: 12px;
+  border: 1px solid rgba(0,0,0,.04);
 }
 .faq-item {
-  background: var(--soft);
+  background: #fff;
   border-radius: 20px;
   overflow: hidden;
-  transition: background .25s ease, box-shadow .25s ease;
+  transition: background .25s ease, box-shadow .25s ease, border-color .25s ease;
+  border: 1px solid rgba(0,0,0,.04);
 }
 .faq-item.open {
   background: #fff;
   box-shadow: var(--shadow-soft);
-  border: 1px solid rgba(0,0,0,.06);
+  border-color: rgba(0,0,0,.08);
 }
 .faq-q {
   width: 100%;
