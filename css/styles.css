@@ -420,6 +420,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   aspect-ratio: 1120 / 640;
 }
 .reel-frame iframe,
+.reel-frame .reel-fallback,
+.reel-frame .reel-fallback img,
 .reel-thumb {
   position: absolute;
   inset: 0;
@@ -427,6 +429,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   height: 100%;
   border: 0;
   object-fit: cover;
+}
+.reel-frame .reel-fallback {
+  display: block;
+}
+.reel-frame .reel-fallback .play-btn {
+  z-index: 1;
 }
 .reel-grid {
   display: grid;

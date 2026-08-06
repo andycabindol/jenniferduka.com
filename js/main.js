@@ -48,21 +48,66 @@
     reveals.forEach((el) => el.classList.add("in"));
   }
 
+  const isFileProtocol = location.protocol === "file:";
+
+  const ytThumb = (id) => `https://i.ytimg.com/vi_webp/${id}/sddefault.webp`;
+
+  const createPlayer = (id, { autoplay = false, mute = false, loop = false } = {}) => {
+    const iframe = document.createElement("iframe");
+    iframe.title = "YouTube video";
+    iframe.allow =
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.setAttribute("allowfullscreen", "");
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+    const params = new URLSearchParams({
+      rel: "0",
+      modestbranding: "1",
+      playsinline: "1",
+      iv_load_policy: "3",
+    });
+    if (autoplay) params.set("autoplay", "1");
+    if (mute) params.set("mute", "1");
+    if (loop) {
+      params.set("loop", "1");
+      params.set("playlist", id);
+    }
+    iframe.src = `https://www.youtube.com/embed/${encodeURIComponent(id)}?${params}`;
+    return iframe;
+  };
+
+  // Homepage muted autoplay embeds — only mount over http(s).
+  // Chrome treats file:// frames as unique origins and errors on YouTube iframes.
+  $$("[data-yt-autoplay]").forEach((el) => {
+    const id = el.getAttribute("data-yt-autoplay");
+    if (!id) return;
+
+    if (!isFileProtocol) {
+      el.replaceChildren(createPlayer(id, { autoplay: true, mute: true, loop: true }));
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.className = "reel-fallback";
+    link.innerHTML = `
+      <img src="${ytThumb(id)}" alt="Reel thumbnail" loading="lazy">
+      <span class="play-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+    `;
+    el.replaceChildren(link);
+  });
+
   // Reel lightbox — create iframe only when opened (avoids file:// frame errors)
   const lightbox = $(".lightbox");
   const lightboxInner = lightbox ? $(".lightbox-inner", lightbox) : null;
   const openLightbox = (id) => {
     if (!lightbox || !lightboxInner || !id) return;
-    lightboxInner.replaceChildren();
-    const iframe = document.createElement("iframe");
-    iframe.title = "Reel";
-    iframe.allow =
-      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-    iframe.allowFullscreen = true;
-    iframe.src = `https://www.youtube.com/embed/${encodeURIComponent(
-      id
-    )}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
-    lightboxInner.appendChild(iframe);
+    if (isFileProtocol) {
+      window.open(`https://www.youtube.com/watch?v=${encodeURIComponent(id)}`, "_blank", "noopener,noreferrer");
+      return;
+    }
+    lightboxInner.replaceChildren(createPlayer(id, { autoplay: true }));
     lightbox.classList.add("open");
     document.body.style.overflow = "hidden";
   };
