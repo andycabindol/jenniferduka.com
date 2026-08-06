@@ -269,9 +269,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 18%;
-  mask-image: linear-gradient(to bottom, #000 42%, rgba(0,0,0,.65) 68%, transparent 94%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 42%, rgba(0,0,0,.65) 68%, transparent 94%);
+  object-position: center 12%;
+  mask-image: linear-gradient(to bottom, #000 48%, rgba(0,0,0,.7) 72%, transparent 96%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 48%, rgba(0,0,0,.7) 72%, transparent 96%);
 }
 .hero-content {
   position: relative;
