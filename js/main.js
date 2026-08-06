@@ -48,19 +48,28 @@
     reveals.forEach((el) => el.classList.add("in"));
   }
 
-  // Reel lightbox
+  // Reel lightbox — create iframe only when opened (avoids file:// frame errors)
   const lightbox = $(".lightbox");
-  const lightboxFrame = lightbox ? $("iframe", lightbox) : null;
+  const lightboxInner = lightbox ? $(".lightbox-inner", lightbox) : null;
   const openLightbox = (id) => {
-    if (!lightbox || !lightboxFrame) return;
-    lightboxFrame.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+    if (!lightbox || !lightboxInner || !id) return;
+    lightboxInner.replaceChildren();
+    const iframe = document.createElement("iframe");
+    iframe.title = "Reel";
+    iframe.allow =
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.allowFullscreen = true;
+    iframe.src = `https://www.youtube.com/embed/${encodeURIComponent(
+      id
+    )}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+    lightboxInner.appendChild(iframe);
     lightbox.classList.add("open");
     document.body.style.overflow = "hidden";
   };
   const closeLightbox = () => {
-    if (!lightbox || !lightboxFrame) return;
+    if (!lightbox || !lightboxInner) return;
     lightbox.classList.remove("open");
-    lightboxFrame.src = "";
+    lightboxInner.replaceChildren();
     document.body.style.overflow = "";
   };
   $$("[data-yt]").forEach((el) => {
@@ -84,24 +93,19 @@
   const path = location.pathname.replace(/\/$/, "") || "/";
   $$(".nav-links a, .mobile-nav a").forEach((a) => {
     const href = a.getAttribute("href") || "";
-    const clean = href.replace(/^\.\//, "/").replace(/\/$/, "") || "/";
-    const page =
-      path.endsWith(".html")
-        ? path.split("/").pop().replace(".html", "")
-        : path.split("/").filter(Boolean).pop() || "";
+    const page = path.endsWith(".html")
+      ? path.split("/").pop().replace(".html", "")
+      : path.split("/").filter(Boolean).pop() || "";
     if (
-      (clean === "/" || clean === "index.html" || clean === "./") &&
-      (path === "/" || path.endsWith("index.html") || path === "")
-    ) {
-      // home logo only
-    } else if (
       href.includes("works") &&
       (path.includes("/works") || page === "works")
     ) {
-      if (!href.includes("works/") || path.includes(href.replace("./", ""))) {
-        if (href === "./works.html" || href === "/works" || href.endsWith("works.html")) {
-          a.classList.add("active");
-        }
+      if (
+        href === "./works.html" ||
+        href === "/works" ||
+        href.endsWith("works.html")
+      ) {
+        a.classList.add("active");
       }
     } else if (href.includes(page) && page) {
       a.classList.add("active");
