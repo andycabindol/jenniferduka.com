@@ -134,6 +134,136 @@
     });
   }
 
+  // Reels page: prefer local boomerang GIF; otherwise mute-loop a mid-clip YouTube preview.
+  const BOOM_HALF = 0.65; // seconds each side of midpoint
+  const loadYtApi = () =>
+    new Promise((resolve) => {
+      if (window.YT && window.YT.Player) {
+        resolve(window.YT);
+        return;
+      }
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (typeof prev === "function") prev();
+        resolve(window.YT);
+      };
+      if (![...document.scripts].some((s) => (s.src || "").includes("youtube.com/iframe_api"))) {
+        const s = document.createElement("script");
+        s.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(s);
+      }
+    });
+
+  const tryBoomGif = (img) =>
+    new Promise((resolve) => {
+      const gif = img.getAttribute("data-boom-gif");
+      if (!gif) {
+        resolve(false);
+        return;
+      }
+      const probe = new Image();
+      probe.onload = () => {
+        img.src = gif;
+        resolve(true);
+      };
+      probe.onerror = () => resolve(false);
+      probe.src = gif;
+    });
+
+  const mountMidLoop = (card, id) => {
+    const host = $(".reel-boom", card);
+    if (!host || host.dataset.ready) return;
+    host.dataset.ready = "1";
+    const mount = document.createElement("div");
+    host.appendChild(mount);
+
+    loadYtApi().then((YT) => {
+      let start = 0;
+      let end = 0;
+      let timer = null;
+      const player = new YT.Player(mount, {
+        videoId: id,
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          controls: 0,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          iv_load_policy: 3,
+          fs: 0,
+          disablekb: 1,
+        },
+        events: {
+          onReady: (e) => {
+            const p = e.target;
+            const duration = p.getDuration() || 0;
+            if (!duration || duration < 1) return;
+            const mid = duration / 2;
+            start = Math.max(0.05, mid - BOOM_HALF);
+            end = Math.min(duration - 0.05, mid + BOOM_HALF);
+            p.mute();
+            p.seekTo(start, true);
+            p.playVideo();
+            card.classList.add("is-booming");
+            timer = window.setInterval(() => {
+              try {
+                const t = p.getCurrentTime();
+                if (t >= end || t < start - 0.2) p.seekTo(start, true);
+              } catch (_) {}
+            }, 120);
+          },
+          onStateChange: (e) => {
+            if (e.data === YT.PlayerState.ENDED) {
+              e.target.seekTo(start, true);
+              e.target.playVideo();
+            }
+          },
+          onError: () => {
+            if (timer) window.clearInterval(timer);
+            card.classList.remove("is-booming");
+          },
+        },
+      });
+      card._boomCleanup = () => {
+        if (timer) window.clearInterval(timer);
+        try {
+          player.destroy();
+        } catch (_) {}
+      };
+    });
+  };
+
+  const boomCards = $$("[data-yt-boom]");
+  if (boomCards.length) {
+    boomCards.forEach(async (card) => {
+      const id = card.getAttribute("data-yt");
+      const poster = $(".reel-poster", card);
+      const hasGif = poster ? await tryBoomGif(poster) : false;
+      if (hasGif) {
+        card.classList.add("has-boom-gif");
+        return;
+      }
+      if (isFileProtocol || !id) return;
+      if ("IntersectionObserver" in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                mountMidLoop(card, id);
+                io.unobserve(card);
+              }
+            });
+          },
+          { threshold: 0.35 }
+        );
+        io.observe(card);
+      } else {
+        mountMidLoop(card, id);
+      }
+    });
+  }
+
   // Active nav highlight
   const path = location.pathname.replace(/\/$/, "") || "/";
   $$(".nav-links a, .mobile-nav a").forEach((a) => {
