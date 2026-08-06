@@ -925,20 +925,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   z-index: 1;
 }
 .testimonial {
-  display: grid;
-  grid-template-columns: 45px 1fr;
-  gap: 12px;
+  display: block;
   background: #fff;
   border-radius: 20px;
   padding: 16px;
   border: 1px solid rgba(0,0,0,.04);
   box-shadow: var(--shadow-soft);
-}
-.testimonial img {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  object-fit: cover;
 }
 .testimonial .who {
   font-size: 15px;
