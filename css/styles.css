@@ -251,28 +251,37 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   position: absolute;
   left: 50%;
   top: 100px;
-  transform: translateX(-50%);
-  width: min(1117px, 78vw);
+  width: min(1117px, calc(100vw - 80px));
+  height: min(886px, 61.5vw);
   z-index: 0;
   pointer-events: none;
+  /* keep translateX even after .reveal.in clears transform */
+  translate: -50% 0;
+}
+.hero-media.reveal {
+  opacity: 1;
+  transform: none;
 }
 .hero-media img {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
-  mask-image: linear-gradient(to bottom, #000 55%, transparent 95%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 95%);
+  object-position: center top;
+  mask-image: linear-gradient(to bottom, #000 50%, rgba(0,0,0,.55) 72%, transparent 92%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 50%, rgba(0,0,0,.55) 72%, transparent 92%);
 }
 .hero-content {
   position: relative;
   z-index: 1;
   width: min(100% - 80px, 1360px);
-  margin: 560px auto 0;
+  margin: 0 auto;
+  padding-top: 578px;
+  padding-bottom: 48px;
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: minmax(0, 600px) 300px;
+  justify-content: space-between;
   gap: 40px;
   align-items: end;
-  padding-bottom: 48px;
 }
 .availability {
   display: inline-flex;
@@ -338,14 +347,17 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 /* ===== WORK GRID ===== */
 .work-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 554px));
+  justify-content: space-between;
+  column-gap: 12px;
+  row-gap: 24px;
 }
 .work-card {
   position: relative;
   display: block;
   border-radius: var(--radius-lg);
   overflow: hidden;
+  width: 100%;
   aspect-ratio: 554 / 420;
   background: #111;
   transform: translateZ(0);
@@ -531,11 +543,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   box-shadow: var(--shadow-card);
 }
 .hl-quote .qmark {
-  font-size: 64px;
-  line-height: 1;
-  color: rgba(255,255,255,.22);
+  font-size: 72px;
+  line-height: 0.8;
+  color: rgba(255,255,255,.2);
   font-weight: 500;
-  margin-bottom: 8px;
+  margin: 0 0 12px;
+  font-family: Georgia, serif;
 }
 .hl-quote blockquote {
   margin: 0;
@@ -544,12 +557,14 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   line-height: 1.35;
   letter-spacing: -0.6px;
 }
-.hl-quote .quote-info {
+.hl-quote .quote-foot {
   margin-top: auto;
+  padding-top: 28px;
+}
+.hl-quote .quote-info {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-top: 28px;
 }
 .hl-quote .quote-info img {
   width: 36px;
@@ -568,7 +583,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: rgba(255,255,255,.65);
 }
 .trusted {
-  margin-top: 18px;
+  margin-top: 16px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1122,8 +1137,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 @media (max-width: 1199px) {
   :root { --page-pad: 40px; }
   .nav-inner { padding: 10px 24px; }
-  .hero-content { margin-top: 480px; }
+  .hero-content {
+    padding-top: 480px;
+    grid-template-columns: 1fr 260px;
+  }
   .hero h1 { font-size: 34px; line-height: 40px; }
+  .work-grid { grid-template-columns: 1fr 1fr; }
   .highlights { grid-template-columns: 1fr; }
   .hl-card { min-height: auto; }
   .faq-wrap { grid-template-columns: 1fr; gap: 28px; }
@@ -1153,9 +1172,13 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .menu-toggle { display: inline-flex; }
   .nav-inner { grid-template-columns: 1fr auto; padding: 10px 16px; }
   .hero { min-height: auto; padding-bottom: 40px; }
-  .hero-media { width: 100%; top: 80px; }
+  .hero-media {
+    width: calc(100vw - 32px);
+    height: 70vw;
+    top: 80px;
+  }
   .hero-content {
-    margin-top: 380px;
+    padding-top: 320px;
     grid-template-columns: 1fr;
     gap: 24px;
   }
