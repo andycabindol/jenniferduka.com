@@ -111,6 +111,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   display: flex;
   align-items: center;
   pointer-events: none;
+  background-color: #ffffff;
 }
 .site-header > * { pointer-events: auto; }
 .nav-inner {
